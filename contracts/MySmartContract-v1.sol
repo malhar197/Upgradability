@@ -10,6 +10,7 @@ pragma solidity ^0.6.0;
 contract MySmartContractV1 {
     uint32 public counter;
     address private owner;
+    bool contractActive = true;
 
     /**
     @dev Enforces the caller to be the contract's owner.
@@ -19,17 +20,26 @@ contract MySmartContractV1 {
         _;
     }
 
+    modifier isNotStopped {
+        require(contractActive == true, "Contract is stopped.");
+        _;
+    }
+
     constructor() public {
         counter = 0;
         // Sets the contract's owner as the address that deployed the contract.
         owner = msg.sender;
     }
 
+    function toggleContractStopped() public isOwner {
+        contractActive = false;
+    }
+
     /**
     @notice Increments the contract's counter if contract is active.
     @dev It should revert if the contract is stopped. Create a modifier named "isNotStopped"
     */
-    function incrementCounter() public {
+    function incrementCounter() public isNotStopped {
         counter += 2; // This is an intentional bug.
     }
 }
